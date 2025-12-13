@@ -10,10 +10,9 @@ import { API_URL, CLIENT_KEY } from '@/config/env';
 export interface User {
   id: string;
   email: string;
-  role: 'user' | 'admin' | 'super_user';
+  role: 'service_desk_user' | 'standard_user' | 'super_user';
 }
 
-// TODO: token won't be returned in the future (HTTP-only cookie will be used)
 export interface AuthResponse {
   user: User;
 }
@@ -68,6 +67,31 @@ export const loginUser = createAsyncThunk<
   }
 });
 
+// TODO: check in backend why email is not in the /auth/me response
+export const checkAuth = createAsyncThunk<User | null>(
+  'user/checkAuth',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/me`, {
+        credentials: 'include',
+        headers: {
+          'x-client-key': CLIENT_KEY,
+        },
+      });
+
+      if (!response.ok) {
+        return rejectWithValue('Not authenticated');
+      }
+
+      const data = await response.json();
+      console.log('Auth check response data:', data);
+      return data.body.user;
+    } catch (error) {
+      return rejectWithValue('Network error');
+    }
+  }
+);
+
 export const logoutUser = createAsyncThunk(
   'user/logout',
   async (_, { dispatch }) => {
@@ -113,6 +137,17 @@ const userSlice = createSlice({
         state.user = null;
         state.status = 'idle';
         state.error = null;
+      })
+      // Check auth cases
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.user = action.payload;
+          state.status = 'succeeded';
+        }
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.user = null;
+        state.status = 'failed';
       });
   },
 });

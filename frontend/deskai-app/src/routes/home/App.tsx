@@ -1,8 +1,8 @@
-import { API_URL, CLIENT_KEY } from '@/config/env';
-
 // Hooks
 import { useTitle } from '@/hooks/useTitle';
 import { useInputValue } from '@/hooks/useInputValue';
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 
 // Components
 import BtnBlueGreenDeg from '@/components/btn_blue_green_deg';
@@ -20,7 +20,6 @@ import {
 const DeskaiLogin = () => {
   useTitle('Deskai Login');
 
-  // TODO: remove hardcoded default values
   const emailInput = useInputValue('');
   const passwordInput = useInputValue('');
   // A dispatch is needed to send actions to the store
@@ -30,7 +29,15 @@ const DeskaiLogin = () => {
   const error = useAppSelector(selectAuthError);
   const user = useAppSelector(selectUser);
 
-  console.log('Current user:', user);
+  // If already logged in, redirect to dashboard
+  const from = useLocation().state?.from?.pathname || '/dashboard';
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,21 +57,6 @@ const DeskaiLogin = () => {
     dispatch(
       loginUser({ email: emailInput.value, password: passwordInput.value })
     );
-
-    // const response = await fetch(`${API_URL}/auth/login`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'x-client-key': CLIENT_KEY,
-    //   },
-    //   body: JSON.stringify({
-    //     email: emailInput.value,
-    //     password: passwordInput.value,
-    //   }),
-    // });
-
-    // const data = await response.json();
-    // console.log('Login response:', data);
   };
 
   return (

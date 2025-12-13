@@ -5,6 +5,7 @@ import { errorResponse } from '@utils/response';
 
 export interface AuthPayload {
   userId: string;
+  email: string;
   role: string;
 }
 

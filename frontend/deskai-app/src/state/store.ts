@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '@state/counter/counterSlice';
 import userReducer from '@state/user/userSlice';
 import {
   type TypedUseSelectorHook,
@@ -9,7 +8,6 @@ import {
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
     user: userReducer,
   },
 });
