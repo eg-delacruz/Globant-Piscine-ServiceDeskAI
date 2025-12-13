@@ -21,8 +21,8 @@ const DeskaiLogin = () => {
   useTitle('Deskai Login');
 
   // TODO: remove hardcoded default values
-  const emailInput = useInputValue('admin@example.com');
-  const passwordInput = useInputValue('SuperPassword123');
+  const emailInput = useInputValue('');
+  const passwordInput = useInputValue('');
   // A dispatch is needed to send actions to the store
   const dispatch = useAppDispatch();
 
