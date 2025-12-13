@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 
 import { router } from '@routes/index';
 
@@ -16,7 +17,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // CORS
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
+
+// Cookie parser (used to parse cookies from requests)
+app.use(cookieParser());
 
 // HTTP request logger -> displays the requests in the console
 app.use(morgan('dev'));
@@ -27,7 +36,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // Client header check middleware
-// app.use(clientHeaderCheck);
+app.use(clientHeaderCheck);
 
 // Routes
 app.use('/api', router);

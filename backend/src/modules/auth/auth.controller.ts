@@ -34,8 +34,14 @@ export const loginController = async (
       { expiresIn: '1d' }
     );
 
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
     const body = {
-      token,
       user: {
         id: user._id,
         email: user.email,

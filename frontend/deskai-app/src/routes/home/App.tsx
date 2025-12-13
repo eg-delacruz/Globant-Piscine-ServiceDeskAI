@@ -14,19 +14,23 @@ import {
   loginUser,
   selectAuthError,
   selectAuthStatus,
+  selectUser,
 } from '@/state/user/userSlice';
 
 const DeskaiLogin = () => {
   useTitle('Deskai Login');
 
   // TODO: remove hardcoded default values
-  const emailInput = useInputValue('');
-  const passwordInput = useInputValue('');
+  const emailInput = useInputValue('admin@example.com');
+  const passwordInput = useInputValue('SuperPassword123');
   // A dispatch is needed to send actions to the store
   const dispatch = useAppDispatch();
 
   const status = useAppSelector(selectAuthStatus);
   const error = useAppSelector(selectAuthError);
+  const user = useAppSelector(selectUser);
+
+  console.log('Current user:', user);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
