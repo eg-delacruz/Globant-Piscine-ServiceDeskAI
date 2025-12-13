@@ -8,7 +8,7 @@ interface Env {
   SUPER_PASS: string;
   JWT_SECRET: string;
   NODE_ENV: string;
-  CLIENT_HEADER_KEY: string;
+  VITE_CLIENT_HEADER_KEY: string;
 }
 
 const env: Env = {
@@ -18,7 +18,8 @@ const env: Env = {
   SUPER_PASS: process.env.SUPER_PASS || '',
   JWT_SECRET: process.env.JWT_SECRET || 'defaultsecret',
   NODE_ENV: process.env.NODE_ENV || 'development',
-  CLIENT_HEADER_KEY: process.env.CLIENT_HEADER_KEY || 'defaultclientkey',
+  VITE_CLIENT_HEADER_KEY:
+    process.env.VITE_CLIENT_HEADER_KEY || 'defaultclientkey',
 };
 
 // Simple check to ensure required variables exist

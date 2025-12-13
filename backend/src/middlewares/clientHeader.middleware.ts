@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { errorResponse } from '@utils/response';
-import env from '@config/env'; // env.CLIENT_HEADER_KEY
+import env from '@config/env'; // env.VITE_CLIENT_HEADER_KEY
 import { logger } from '@config/logger';
 
 export function clientHeaderCheck(
@@ -19,7 +19,7 @@ export function clientHeaderCheck(
     );
   }
 
-  if (clientHeader !== env.CLIENT_HEADER_KEY) {
+  if (clientHeader !== env.VITE_CLIENT_HEADER_KEY) {
     logger.error(`Invalid client header: ${clientHeader}`);
     return errorResponse(
       res,
