@@ -6,6 +6,8 @@ import { User } from '@modules/user/user.model';
 import env from '@config/env';
 import { successResponse, errorResponse } from '@utils/response';
 
+import { AuthRequest } from '@middlewares/auth.middleware';
+
 export const loginController = async (
   req: Request,
   res: Response,
@@ -53,4 +55,15 @@ export const loginController = async (
   } catch (error) {
     next(error);
   }
+};
+
+// Controller to get current authenticated user's info
+export const meController = async (req: AuthRequest, res: Response) => {
+  return successResponse(
+    res,
+    {
+      user: req.user,
+    },
+    'Authenticated user'
+  );
 };
