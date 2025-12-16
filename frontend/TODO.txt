@@ -1,0 +1,5 @@
+1. Try to move everything to root folder again. When doing so, first, remove the .pnpm-store, the node_modules and the pnpm-lock.yaml files inside the frontend. After moving everything to the root folder, put the .pnpm-store folder (and node_modules as well) in the git ignore, so that vite doesn't track changes in that folder! Afterwards, add those folders to be ignored in vide.config.ts:
+watch: {
+  ignored: ['**/node_modules/**', '**/.pnpm-store/**', '**/dist/**']
+}
+

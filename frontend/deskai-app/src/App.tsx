@@ -3,12 +3,13 @@ import { checkAuth } from '@state/user/userSlice';
 
 // Routes
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
-import Home from './routes/home/App.tsx';
+import Login from './routes/login/index.tsx';
 import Dashboard from '@routes/dashboard';
-
-import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
-import RoleProtectedRoute from './components/auth/RoleProtectedRoute.tsx';
 import Unauthorized from './routes/unauthorized/Unauthorized.tsx';
+
+// Wrappers
+import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
+import MainLayout from './components/layout/MainLayout.tsx';
 
 // Hoocks
 import { useEffect } from 'react';
@@ -25,16 +26,17 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path='/' element={<Home />} />
-        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/' element={<Login />} />
+        <Route path='/unauthorized' element={<Unauthorized />} />
 
-        {/* Protected dashboard (any authenticated user) */}
-        {/* TODO: check why when unlogged, this route doesn't redirect. Continue with step 4 of deepseek */}
+        {/* Protected routes */}
         <Route
           path='/dashboard'
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
             </ProtectedRoute>
           }
         />
@@ -43,14 +45,14 @@ const App = () => {
         <Route
           path='/super-user'
           element={
-            <RoleProtectedRoute allowedRoles={['super_user']}>
+            <ProtectedRoute allowedRoles={['super_user']}>
               {/* <SuperUserDashboard /> */}
               <div>Super User Dashboard</div>
-            </RoleProtectedRoute>
+            </ProtectedRoute>
           }
         />
 
-        {/* Catch all - redirect to dashboard if logged in, home if not */}
+        {/* Catch all - redirect to dashboard if logged in, '/' if not */}
         <Route path='*' element={<Navigate to='/dashboard' replace />} />
       </Routes>
     </BrowserRouter>

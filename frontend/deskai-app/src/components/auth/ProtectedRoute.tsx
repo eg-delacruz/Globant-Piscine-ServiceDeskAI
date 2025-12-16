@@ -1,14 +1,16 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector } from '@state/store';
+import { selectUser, selectAuthStatus } from '@/state/user/userSlice';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'user' | 'admin' | 'super_user';
+  allowedRoles?: ('service_desk_user' | 'standard_user' | 'super_user')[];
 }
 
 // A component that protects routes based on authentication and user roles
-const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { user, status } = useAppSelector((state) => state.user);
+const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+  const user = useAppSelector(selectUser);
+  const status = useAppSelector(selectAuthStatus);
   const location = useLocation();
 
   // Show loading while checking auth
@@ -22,13 +24,16 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
 
   // If no user is logged in, redirect to login
   if (!user) {
-    return <Navigate to='/login' state={{ from: location }} replace />;
+    return <Navigate to='/' state={{ from: location }} replace />;
   }
 
-  // If role is required and user doesn't have it, redirect to dashboard
-  if (requiredRole && user.role !== requiredRole) {
-    // You might want to show a "not authorized" page instead
-    return <Navigate to='/dashboard' replace />;
+  // If roles are specified and user doesn't have required role, redirect to dashboard
+  if (
+    allowedRoles &&
+    allowedRoles.length > 0 &&
+    !allowedRoles.includes(user.role)
+  ) {
+    return <Navigate to='/unauthorized' replace />;
   }
 
   // User is authenticated and has required role (if any)

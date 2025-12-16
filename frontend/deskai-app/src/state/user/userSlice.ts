@@ -84,7 +84,6 @@ export const checkAuth = createAsyncThunk<User | null>(
       }
 
       const data = await response.json();
-      console.log('Auth check response data:', data);
       return data.body.user;
     } catch (error) {
       return rejectWithValue('Network error');
@@ -139,10 +138,16 @@ const userSlice = createSlice({
         state.error = null;
       })
       // Check auth cases
+      .addCase(checkAuth.pending, (state) => {
+        state.status = 'loading';
+      })
       .addCase(checkAuth.fulfilled, (state, action) => {
         if (action.payload) {
           state.user = action.payload;
           state.status = 'succeeded';
+        } else {
+          state.user = null;
+          state.status = 'failed';
         }
       })
       .addCase(checkAuth.rejected, (state) => {
