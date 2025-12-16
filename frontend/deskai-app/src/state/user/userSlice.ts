@@ -26,6 +26,7 @@ export interface ApiResponse {
 export interface UserState {
   user: User | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  logout_loading: boolean;
   error: string | null;
 }
 
@@ -33,6 +34,7 @@ export interface UserState {
 const initialState: UserState = {
   user: null,
   status: 'idle',
+  logout_loading: false,
   error: null,
 };
 
@@ -93,9 +95,29 @@ export const checkAuth = createAsyncThunk<User | null>(
 
 export const logoutUser = createAsyncThunk(
   'user/logout',
-  async (_, { dispatch }) => {
-    // TODO: call logout API if needed
-    return;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'x-client-key': CLIENT_KEY,
+        },
+      });
+
+      if (!response.ok) {
+        return rejectWithValue('An error occurred while logout');
+      }
+
+      const data = await response.json();
+      if (data.error) {
+        return rejectWithValue(data.error);
+      }
+
+      return;
+    } catch (error) {
+      return rejectWithValue('Not authenticated');
+    }
   }
 );
 
@@ -136,6 +158,10 @@ const userSlice = createSlice({
         state.user = null;
         state.status = 'idle';
         state.error = null;
+        state.logout_loading = false;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.logout_loading = true;
       })
       // Check auth cases
       .addCase(checkAuth.pending, (state) => {

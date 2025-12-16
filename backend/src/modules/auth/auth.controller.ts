@@ -8,7 +8,7 @@ import { successResponse, errorResponse } from '@utils/response';
 
 import { AuthRequest } from '@middlewares/auth.middleware';
 
-export const loginController = async (
+export const handleLogin = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -58,7 +58,7 @@ export const loginController = async (
 };
 
 // Controller to get current authenticated user's info
-export const meController = async (req: AuthRequest, res: Response) => {
+export const getCurrentUser = async (req: AuthRequest, res: Response) => {
   return successResponse(
     res,
     {
@@ -66,4 +66,14 @@ export const meController = async (req: AuthRequest, res: Response) => {
     },
     'Authenticated user'
   );
+};
+
+export const handleLogout = (req: Request, res: Response) => {
+  res.clearCookie('access_token', {
+    httpOnly: true, // Ensures the cookie is only accessible via HTTP(S), not JavaScript
+    secure: env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS in production
+    sameSite: 'strict', // Helps prevent CSRF attacks
+  });
+
+  return successResponse(res, null, 'Logout successful', 200);
 };
