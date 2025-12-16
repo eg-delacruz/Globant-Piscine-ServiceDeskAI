@@ -33,6 +33,7 @@ const DeskaiLogin = () => {
   const from = useLocation().state?.from?.pathname || '/dashboard';
   const navigate = useNavigate();
 
+  // Redirect if user is logged in
   useEffect(() => {
     if (user) {
       navigate(from, { replace: true });

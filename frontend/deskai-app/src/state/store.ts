@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '@state/user/userSlice';
+import officeReducer from '@state/office/officeSlice';
 import {
   type TypedUseSelectorHook,
   useDispatch,
@@ -9,6 +10,7 @@ import {
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    office: officeReducer,
   },
 });
 

@@ -31,7 +31,7 @@ export const handleLogin = async (
     }
 
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role, email: user.email },
       env.JWT_SECRET,
       { expiresIn: '1d' }
     );

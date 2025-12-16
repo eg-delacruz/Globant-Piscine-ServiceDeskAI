@@ -49,7 +49,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
                 {user.role === 'super_user' && (
                   <Link
-                    to='/super-user'
+                    to='/admin'
                     className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
                   >
                     Admin
@@ -62,6 +62,15 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
                   >
                     Manage Users
+                  </Link>
+                )}
+
+                {user.role === 'super_user' && (
+                  <Link
+                    to='/offices/manage'
+                    className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
+                  >
+                    Manage Offices
                   </Link>
                 )}
               </div>

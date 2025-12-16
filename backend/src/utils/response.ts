@@ -83,7 +83,7 @@ export const errorResponse = (
   }
 
   return res.status(status).json({
-    error: '',
+    error: msg,
     body: '',
     message: msg,
   });

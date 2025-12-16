@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
 import Login from './routes/login/index.tsx';
 import Dashboard from '@routes/dashboard';
 import Unauthorized from './routes/unauthorized/Unauthorized.tsx';
+import AdminPage from './routes/admin/Admin.tsx';
 
 // Wrappers
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
@@ -43,11 +44,12 @@ const App = () => {
 
         {/* Super user protected route */}
         <Route
-          path='/super-user'
+          path='/admin'
           element={
             <ProtectedRoute allowedRoles={['super_user']}>
-              {/* <SuperUserDashboard /> */}
-              <div>Super User Dashboard</div>
+              <MainLayout>
+                <AdminPage />
+              </MainLayout>
             </ProtectedRoute>
           }
         />

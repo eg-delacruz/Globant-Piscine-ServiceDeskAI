@@ -4,6 +4,8 @@ import {
   type PayloadAction,
 } from '@reduxjs/toolkit';
 
+import type { ApiResponse } from '@/types/generic_types';
+
 import { API_URL, CLIENT_KEY } from '@/config/env';
 
 // Types
@@ -15,12 +17,6 @@ export interface User {
 
 export interface AuthResponse {
   user: User;
-}
-
-export interface ApiResponse {
-  error: string;
-  body: AuthResponse;
-  message: string;
 }
 
 export interface UserState {
@@ -55,7 +51,7 @@ export const loginUser = createAsyncThunk<
       body: JSON.stringify(credentials),
     });
 
-    const data: ApiResponse = await response.json();
+    const data: ApiResponse<{ user: User }> = await response.json();
 
     if (!response.ok || data.error) {
       return rejectWithValue(data.error || 'Login failed');
@@ -69,7 +65,6 @@ export const loginUser = createAsyncThunk<
   }
 });
 
-// TODO: check in backend why email is not in the /auth/me response
 export const checkAuth = createAsyncThunk<User | null>(
   'user/checkAuth',
   async (_, { rejectWithValue }) => {
@@ -106,7 +101,7 @@ export const logoutUser = createAsyncThunk(
       });
 
       if (!response.ok) {
-        return rejectWithValue('An error occurred while logout');
+        return rejectWithValue('An error occurred during logout');
       }
 
       const data = await response.json();
