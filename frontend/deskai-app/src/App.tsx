@@ -7,6 +7,7 @@ import Login from './routes/login/index.tsx';
 import Dashboard from '@routes/dashboard';
 import Unauthorized from './routes/unauthorized/Unauthorized.tsx';
 import AdminPage from './routes/admin/Admin.tsx';
+import OfficeList from './routes/admin/Offices.tsx';
 
 // Wrappers
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
@@ -49,6 +50,17 @@ const App = () => {
             <ProtectedRoute allowedRoles={['super_user']}>
               <MainLayout>
                 <AdminPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path='/admin/offices'
+          element={
+            <ProtectedRoute allowedRoles={['super_user']}>
+              <MainLayout>
+                <OfficeList />
               </MainLayout>
             </ProtectedRoute>
           }

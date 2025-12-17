@@ -11,7 +11,7 @@ import { API_URL, CLIENT_KEY } from '@/config/env';
 
 // Types
 export interface Office {
-  id: string;
+  _id: string;
   name: string;
   location: string;
   isActive: boolean;
@@ -30,6 +30,7 @@ interface OfficeState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   createOfficeStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  deleteOfficeStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 // Initial state
@@ -38,6 +39,7 @@ const initialState: OfficeState = {
   status: 'idle',
   error: null,
   createOfficeStatus: 'idle',
+  deleteOfficeStatus: 'idle',
 };
 
 // Async thunks
@@ -72,12 +74,11 @@ export const createOffice = createAsyncThunk<
 });
 
 export const fetchOffices = createAsyncThunk<
-  { offices: Office[] }, // Return type
+  Office[], // Return type
   void, // Argument type
   { rejectValue: string } // Rejection value type
 >('office/fetchAll', async (_, { rejectWithValue }) => {
   try {
-    // TODO: create endpoint for fetching all offices
     const response = await fetch(`${API_URL}/offices/`, {
       method: 'GET',
       credentials: 'include',
@@ -86,13 +87,41 @@ export const fetchOffices = createAsyncThunk<
       },
     });
 
-    const data: ApiResponse<{ offices: Office[] }> = await response.json();
+    const data: ApiResponse<Office[]> = await response.json();
 
     if (!response.ok || data.error) {
       return rejectWithValue(data.error || 'Failed to fetch offices');
     }
 
     return data.body;
+  } catch (error) {
+    return rejectWithValue(
+      error instanceof Error ? error.message : 'Network error'
+    );
+  }
+});
+
+export const deleteOffice = createAsyncThunk<
+  string, // Return type on success. This is what the dispatch(deleteOffice(id).unwrap()) call will resolve to
+  string,
+  { rejectValue: string } // Rejection value type
+>('office/delete', async (officeId, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${API_URL}/offices/delete/${officeId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'x-client-key': CLIENT_KEY,
+      },
+    });
+
+    const data: ApiResponse<''> = await response.json();
+
+    if (!response.ok || data.error) {
+      return rejectWithValue(data.error || 'Failed to fetch offices');
+    }
+
+    return officeId;
   } catch (error) {
     return rejectWithValue(
       error instanceof Error ? error.message : 'Network error'
@@ -142,19 +171,29 @@ const officeSlice = createSlice({
       })
       .addCase(
         fetchOffices.fulfilled,
-        (
-          state,
-          action: PayloadAction<{
-            offices: Office[];
-          }>
-        ) => {
+        (state, action: PayloadAction<Office[]>) => {
           state.status = 'succeeded';
-          state.offices = action.payload.offices;
+          state.offices = action.payload;
         }
       )
       .addCase(fetchOffices.rejected, (state, action) => {
         state.status = 'failed';
         state.error = (action.payload as string) || 'Failed to fetch offices';
+      })
+      .addCase(deleteOffice.pending, (state) => {
+        state.deleteOfficeStatus = 'loading';
+        state.error = null;
+      })
+      .addCase(deleteOffice.fulfilled, (state, action) => {
+        state.deleteOfficeStatus = 'succeeded';
+        // Remove office from state
+        state.offices = state.offices.filter(
+          (office) => office._id !== action.payload
+        );
+      })
+      .addCase(deleteOffice.rejected, (state, action) => {
+        state.deleteOfficeStatus = 'failed';
+        state.error = (action.payload as string) || 'Failed to delete office';
       });
   },
 });
@@ -165,7 +204,7 @@ export const { clearError, resetCreateStatus } = officeSlice.actions;
 export default officeSlice.reducer;
 
 // Selectors
-export const selectAllOffices = (state: { office: OfficeState }) =>
+export const selectAllOffices = (state: { office: OfficeState }): Office[] =>
   state.office.offices;
 export const selectOfficeStatus = (state: { office: OfficeState }) =>
   state.office.status;
@@ -173,3 +212,5 @@ export const selectOfficeError = (state: { office: OfficeState }) =>
   state.office.error;
 export const selectCreateOfficeStatus = (state: { office: OfficeState }) =>
   state.office.createOfficeStatus;
+export const selectDeleteOfficeStatus = (state: { office: OfficeState }) =>
+  state.office.deleteOfficeStatus;

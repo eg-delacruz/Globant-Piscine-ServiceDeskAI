@@ -67,7 +67,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
                 {user.role === 'super_user' && (
                   <Link
-                    to='/offices/manage'
+                    to='/admin/offices'
                     className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
                   >
                     Manage Offices

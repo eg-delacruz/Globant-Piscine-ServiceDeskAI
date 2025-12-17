@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '@/state/store';
-import { createOffice } from '@/state/office/officeSlice';
+import { createOffice, fetchOffices } from '@/state/office/officeSlice';
 import {
   selectCreateOfficeStatus,
   selectOfficeError,
+  selectOfficeStatus,
 } from '@/state/office/officeSlice';
 
 const AdminPage = () => {
@@ -47,9 +48,6 @@ const AdminPage = () => {
         location: '',
         isActive: true,
       });
-
-      // Optionally, show success message
-      alert('Office created successfully!');
     }
   }, [createOfficeStatus]);
 
@@ -68,7 +66,15 @@ const AdminPage = () => {
       return;
     }
 
-    dispatch(createOffice(officeData));
+    try {
+      await dispatch(createOffice(officeData)).unwrap();
+
+      // Fetch offices to update the list
+      await dispatch(fetchOffices());
+
+      // Show success message
+      alert('Office created successfully!');
+    } catch (error) {}
   };
 
   return (
