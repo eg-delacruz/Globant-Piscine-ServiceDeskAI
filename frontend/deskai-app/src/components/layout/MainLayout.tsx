@@ -2,6 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@state/store';
 import { logoutUser } from '../../state/user/userSlice';
+import { useState, useRef, useEffect } from 'react';
 
 // Selectors
 import { selectUser } from '@/state/user/userSlice';
@@ -10,6 +11,26 @@ import { selectUser } from '@/state/user/userSlice';
 import DeskAiLogo from '../deskai_logo';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -47,31 +68,64 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                   Dashboard
                 </Link>
 
+                {/* Admin Dropdown for super_user */}
                 {user.role === 'super_user' && (
-                  <Link
-                    to='/admin'
-                    className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
-                  >
-                    Admin
-                  </Link>
-                )}
+                  <div className='relative' ref={dropdownRef}>
+                    <button
+                      type='button'
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className='flex items-center text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm focus:outline-none'
+                    >
+                      Admin
+                      <span className='material-symbols-outlined ml-1 text-base'>
+                        {isDropdownOpen ? 'expand_less' : 'expand_more'}
+                      </span>
+                    </button>
 
-                {user.role === 'super_user' && (
-                  <Link
-                    to='/users/manage'
-                    className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
-                  >
-                    Manage Users
-                  </Link>
-                )}
+                    {/* Dropdown Menu */}
+                    {isDropdownOpen && (
+                      <div className='absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50'>
+                        <Link
+                          to='/admin'
+                          className='block px-4 py-2 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors'
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <div className='flex items-center'>
+                            <span className='material-symbols-outlined mr-2 text-base'>
+                              group_add
+                            </span>
+                            Create users and offices
+                          </div>
+                        </Link>
 
-                {user.role === 'super_user' && (
-                  <Link
-                    to='/admin/offices'
-                    className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
-                  >
-                    Manage Offices
-                  </Link>
+                        <Link
+                          to='/admin/users'
+                          className='block px-4 py-2 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors'
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <div className='flex items-center'>
+                            <span className='material-symbols-outlined mr-2 text-base'>
+                              manage_accounts
+                            </span>
+                            Manage Users
+                          </div>
+                        </Link>
+
+                        <Link
+                          to='/admin/offices'
+                          className='block px-4 py-2 text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors'
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <div className='flex items-center'>
+                            <span className='material-symbols-outlined mr-2 text-base'>
+                              apartment
+                            </span>
+                            Manage Offices
+                          </div>
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}

@@ -48,13 +48,6 @@ const DeskaiLogin = () => {
       return;
     }
 
-    // Validate email format (simple regex)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailInput.value)) {
-      alert('Please enter a valid email address.');
-      return;
-    }
-
     dispatch(
       loginUser({ email: emailInput.value, password: passwordInput.value })
     );

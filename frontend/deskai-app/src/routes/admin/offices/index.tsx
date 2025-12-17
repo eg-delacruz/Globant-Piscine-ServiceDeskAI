@@ -12,7 +12,7 @@ import {
 } from '@/state/office/officeSlice';
 
 // Components
-import OfficeCard from './OfficeCard';
+import OfficeCard from './components/OfficeCard';
 import Loader from '@/components/Loader';
 
 const OfficeList = () => {

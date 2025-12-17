@@ -6,12 +6,21 @@ import { createOffice, fetchOffices } from '@/state/office/officeSlice';
 import {
   selectCreateOfficeStatus,
   selectOfficeError,
-  selectOfficeStatus,
 } from '@/state/office/officeSlice';
+
+import { createUser, fetchUsers } from '@/state/user/userSlice';
+import {
+  selectCreateUserStatus,
+  selectCreateUserError,
+} from '@/state/user/userSlice';
 
 const AdminPage = () => {
   // State for User Form
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<{
+    email: string;
+    password: string;
+    role: 'standard_user' | 'service_desk_user';
+  }>({
     email: '',
     password: '',
     role: 'standard_user', // Default selection
@@ -26,17 +35,47 @@ const AdminPage = () => {
 
   const createOfficeStatus = useAppSelector(selectCreateOfficeStatus);
   const createOfficeError = useAppSelector(selectOfficeError);
+  const createUserStatus = useAppSelector(selectCreateUserStatus);
+  const createUserError = useAppSelector(selectCreateUserError);
 
   const dispatch = useAppDispatch();
 
+  // Reset user form on successful creation
+  useEffect(() => {
+    if (createUserStatus === 'succeeded') {
+      // Reset user form
+      setUserData({
+        email: '',
+        password: '',
+        role: 'standard_user',
+      });
+    }
+  }, [createUserStatus]);
+
+  // Handle errors
+  useEffect(() => {
+    if (createUserStatus === 'failed') {
+      alert(`Error creating user: ${createUserError}`);
+    }
+  }, [createUserStatus]);
+
   // Handlers
-  const handleUserSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUserSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!userData.email || !userData.password) {
       alert('Please fill in all user fields.');
       return;
     }
+
+    try {
+      await dispatch(createUser(userData)).unwrap();
+
+      // Fetch users to update the list
+      await dispatch(fetchUsers());
+      // Show success message
+      alert('User created successfully!');
+    } catch (error) {}
   };
 
   // Reset office form on successful creation
@@ -158,7 +197,12 @@ const AdminPage = () => {
                     className='w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none transition-all cursor-pointer'
                     value={userData.role}
                     onChange={(e) =>
-                      setUserData({ ...userData, role: e.target.value })
+                      setUserData({
+                        ...userData,
+                        role: e.target.value as
+                          | 'standard_user'
+                          | 'service_desk_user',
+                      })
                     }
                   >
                     <option value='standard_user'>Standard User</option>

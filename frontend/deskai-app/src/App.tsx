@@ -6,8 +6,9 @@ import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
 import Login from './routes/login/index.tsx';
 import Dashboard from '@routes/dashboard';
 import Unauthorized from './routes/unauthorized/Unauthorized.tsx';
-import AdminPage from './routes/admin/Admin.tsx';
-import OfficeList from './routes/admin/Offices.tsx';
+import AdminPage from './routes/admin/index.tsx';
+import OfficeList from './routes/admin/offices/index.tsx';
+import UserList from './routes/admin/users/index.tsx';
 
 // Wrappers
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
@@ -61,6 +62,17 @@ const App = () => {
             <ProtectedRoute allowedRoles={['super_user']}>
               <MainLayout>
                 <OfficeList />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path='/admin/users'
+          element={
+            <ProtectedRoute allowedRoles={['super_user']}>
+              <MainLayout>
+                <UserList />
               </MainLayout>
             </ProtectedRoute>
           }
