@@ -18,6 +18,7 @@
       "@middlewares/*": ["middlewares/*"],
       "@routes/*": ["routes/*"],
       "@seed/*": ["seed/*"],
+      "@interfaces/*": ["types/*"],
       "@/*": ["*"]
     }
   }

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 
 import { router } from '@routes/index';
 
@@ -15,6 +16,10 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+// Static files (for serving uploaded files)
+// TODO: test this from frontend
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // CORS
 app.use(
@@ -36,6 +41,7 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 // Client header check middleware
+// TODO: uncomment this line!!!
 app.use(clientHeaderCheck);
 
 // Routes
@@ -44,6 +50,7 @@ app.use('/api', router);
 // 404 Not Found middleware
 app.use(notFoundMiddleware);
 
+// TODO: investigate why this error middleware executes in the catch blocks just by calling next(error). Why this and not the notFoundMiddleware above?
 // Error handling middleware
 app.use(errorHandler);
 
@@ -61,34 +68,32 @@ backend/
 │   │   └── logger.ts ✅
 │   │
 │   ├── middleware/ ✅
-│   │   ├── auth.middleware.ts
+│   │   ├── auth.middleware.ts ✅
 │   │   ├── error.middleware.ts ✅
-│   │   └── role.middleware.ts
+│   │   └── role.middleware.ts ✅
 │   │
 │   ├── utils/ ✅
-│   │   ├── response.ts
-│   │   ├── jwt.ts
-│   │   └── hashing.ts
+│   │   └── response.ts ✅
 │   │
 │   ├── modules/ ✅
 │   │   ├── user/
 │   │   │   ├── user.model.ts ✅
-│   │   │   ├── user.controller.ts
-│   │   │   ├── user.service.ts
-│   │   │   ├── user.routes.ts
-│   │   │   └── user.types.ts
+│   │   │   ├── user.controller.ts ✅
+│   │   │   ├── user.service.ts ✅
+│   │   │   ├── user.routes.ts ✅
+│   │   │   └── user.types.ts ✅
 │   │   │
-│   │   ├── auth/
-│   │   │   ├── auth.controller.ts
-│   │   │   ├── auth.service.ts
-│   │   │   ├── auth.routes.ts
-│   │   │   └── auth.types.ts
+│   │   ├── auth/ ✅
+│   │   │   ├── auth.controller.ts ✅
+│   │   │   ├── auth.service.ts ✅
+│   │   │   ├── auth.routes.ts ✅
+│   │   │   └── auth.types.ts ✅
 │   │   │
-│   │   ├── report/
-│   │   │   ├── report.model.ts
-│   │   │   ├── report.controller.ts
-│   │   │   ├── report.service.ts
-│   │   │   └── report.routes.ts
+│   │   ├── report/ ✅
+│   │   │   ├── report.model.ts ✅
+│   │   │   ├── report.controller.ts ✅
+│   │   │   ├── report.service.ts ✅
+│   │   │   └── report.routes.ts ✅
 │   │
 │   ├── routes/ ✅
 │   │   └── index.ts ✅
@@ -96,8 +101,8 @@ backend/
 │   └── seed/ ✅
 │       └── ensureSuperUser.ts ✅
 │
-├── package.json
-├── tsconfig.json
-└── Dockerfile
+├── package.json ✅
+├── tsconfig.json ✅
+└── Dockerfile ✅
 
 */

@@ -1,10 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { UserRole } from '@interfaces/roles';
 
 // Define the User interface extending mongoose Document
 export interface IUser extends Document {
   email: string;
   password: string; // hashed
-  role: 'super_user' | 'standard_user' | 'service_desk_user';
+  role: UserRole;
 }
 
 const userSchema: Schema<IUser> = new Schema(
