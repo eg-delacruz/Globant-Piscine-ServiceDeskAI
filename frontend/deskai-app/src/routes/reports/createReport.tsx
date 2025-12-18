@@ -130,17 +130,16 @@ const CreateReport = () => {
     // TODO: refetch reports list here
 
     // Optionally, reset form after submission
-    // setFormData({
-    //   title: '',
-    //   officeId: '',
-    //   description: '',
-    //   image: null,
-    // });
-    // setPreviewUrl(null);
+    setFormData({
+      title: '',
+      officeId: '',
+      description: '',
+      image: null,
+    });
+    setPreviewUrl(null);
 
-    // Redirect to /dashboard:
-    // TODO: uncomment
-    // navigate('/dashboard');
+    // Redirect to /dashboard
+    navigate('/dashboard');
   };
 
   if (officeStatus === 'loading') {

@@ -8,6 +8,7 @@ import { uploadReportImages } from '@middlewares/upload.middleware';
 import {
   createReport,
   getAllReports,
+  getReportById,
   deleteReportById,
   updateReportStatus,
 } from './report.controller';
@@ -27,6 +28,14 @@ router.get(
   authMiddleware,
   requireRole('super_user', 'standard_user', 'service_desk_user'),
   getAllReports
+);
+
+// Get by id
+router.get(
+  '/:id',
+  authMiddleware,
+  requireRole('super_user', 'standard_user', 'service_desk_user'),
+  getReportById
 );
 
 router.delete(
