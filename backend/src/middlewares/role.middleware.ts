@@ -13,11 +13,21 @@ export const requireRole = (...roles: UserRole[]) => {
 
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return errorResponse(res, 'Not authenticated', 401);
+      return errorResponse(
+        res,
+        'Not authenticated',
+        401,
+        'Authentication required'
+      );
     }
 
     if (!roles.includes(req.user.role as UserRole)) {
-      return errorResponse(res, 'Forbidden', 403);
+      return errorResponse(
+        res,
+        'Forbidden',
+        403,
+        'User does not have the required role'
+      );
     }
 
     next();

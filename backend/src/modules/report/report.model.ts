@@ -7,6 +7,7 @@ export interface IReport extends Document {
   description: string;
   status: ReportStatus;
 
+  office: Types.ObjectId;
   createdBy: Types.ObjectId;
   modifiedBy?: Types.ObjectId;
   closedBy?: Types.ObjectId;
@@ -30,6 +31,7 @@ const reportSchema = new Schema<IReport>(
       default: 'open',
     },
 
+    office: { type: Schema.Types.ObjectId, ref: 'Office', required: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     modifiedBy: { type: Schema.Types.ObjectId, ref: 'User' },
 

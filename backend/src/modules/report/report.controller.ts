@@ -11,12 +11,15 @@ export const createReport = async (
   next: NextFunction
 ) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, officeId } = req.body;
 
-    if (!title || !description) {
-      return res.status(400).json({
-        message: 'Title and description are required',
-      });
+    if (!title || !description || !officeId) {
+      return errorResponse(
+        res,
+        'Missing required fields',
+        400,
+        "Missing 'title', 'description', or 'office' in request body"
+      );
     }
 
     const files = req.files as Express.Multer.File[] | undefined;
@@ -26,12 +29,18 @@ export const createReport = async (
       : [];
 
     if (!req.user) {
-      return errorResponse(res, 'User not authenticated', 401);
+      return errorResponse(
+        res,
+        'User not authenticated',
+        401,
+        'Authentication required to create a report'
+      );
     }
 
     const report = await Report.create({
       title,
       description,
+      office: officeId,
       status: 'open',
       createdBy: req.user.userId, // assuming authMiddleware injects this
       attachments,

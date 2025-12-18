@@ -1,16 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from '@state/user/userSlice';
-import officeReducer from '@state/office/officeSlice';
+
 import {
   type TypedUseSelectorHook,
   useDispatch,
   useSelector,
 } from 'react-redux';
 
+// Reducers
+import userReducer from '@state/user/userSlice';
+import officeReducer from '@state/office/officeSlice';
+import reportReducer from '@state/report/reportSlice';
+
 export const store = configureStore({
   reducer: {
     user: userReducer,
     office: officeReducer,
+    report: reportReducer,
   },
 });
 

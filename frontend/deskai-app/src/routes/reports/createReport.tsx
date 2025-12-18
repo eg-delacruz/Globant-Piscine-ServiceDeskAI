@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 // Redux
 import { useAppSelector, useAppDispatch } from '@/state/store';
 import {
@@ -7,10 +9,24 @@ import {
   selectOfficeStatus,
   fetchOffices,
 } from '@/state/office/officeSlice';
+import {
+  createReport,
+  selectCreateReportStatus,
+  selectReportError,
+  clearReportError,
+  resetCreateReportStatus,
+} from '@/state/report/reportSlice';
+
+// Components
 import Loader from '@/components/Loader';
 
 const CreateReport = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    officeId: string;
+    description: string;
+    image: File | null;
+  }>({
     title: '',
     officeId: '', // Added officeId to state
     description: '',
@@ -71,9 +87,21 @@ const CreateReport = () => {
     setPreviewUrl(null);
   };
 
+  const navigate = useNavigate();
+
   const dispatch = useAppDispatch();
   const offices = useAppSelector(selectAllOffices);
   const officeStatus = useAppSelector(selectOfficeStatus);
+  const createReportStatus = useAppSelector(selectCreateReportStatus);
+  const reportError = useAppSelector(selectReportError);
+
+  // Handle errors
+  useEffect(() => {
+    if (createReportStatus === 'failed' && reportError) {
+      alert(`Error: ${reportError}`);
+      dispatch(clearReportError());
+    }
+  }, [createReportStatus, reportError, dispatch]);
 
   // Fetch the list of offices only ONCE if TESToffices is empty (avoid infinite loop!!!!)
   useEffect(() => {
@@ -83,10 +111,36 @@ const CreateReport = () => {
   }, [dispatch]);
 
   // Submit Handler
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Submitting Report:', formData);
-    // Add API logic here
+    dispatch(clearReportError());
+    dispatch(resetCreateReportStatus());
+
+    const form = new FormData();
+
+    form.append('title', formData.title);
+    form.append('officeId', formData.officeId);
+    form.append('description', formData.description);
+    if (formData.image) {
+      form.append('attachments', formData.image);
+    }
+
+    await dispatch(createReport(form));
+
+    // TODO: refetch reports list here
+
+    // Optionally, reset form after submission
+    // setFormData({
+    //   title: '',
+    //   officeId: '',
+    //   description: '',
+    //   image: null,
+    // });
+    // setPreviewUrl(null);
+
+    // Redirect to /dashboard:
+    // TODO: uncomment
+    // navigate('/dashboard');
   };
 
   if (officeStatus === 'loading') {
@@ -299,23 +353,30 @@ const CreateReport = () => {
           {/* Submit Button */}
           <div className='pt-4'>
             <button
+              disabled={createReportStatus === 'loading'}
               type='submit'
               className='w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 focus:ring-4 focus:ring-blue-300/50 flex items-center justify-center gap-2'
             >
-              <span>Submit Report</span>
-              <svg
-                className='w-5 h-5'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M14 5l7 7m0 0l-7 7m7-7H3'
-                />
-              </svg>
+              {createReportStatus === 'loading' ? (
+                'Loading...'
+              ) : (
+                <>
+                  <span>Submit Report</span>
+                  <svg
+                    className='w-5 h-5'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth='2'
+                      d='M14 5l7 7m0 0l-7 7m7-7H3'
+                    />
+                  </svg>
+                </>
+              )}
             </button>
           </div>
         </form>
