@@ -9,6 +9,7 @@ import Unauthorized from './routes/unauthorized/Unauthorized.tsx';
 import AdminPage from './routes/admin/index.tsx';
 import OfficeList from './routes/admin/offices/index.tsx';
 import UserList from './routes/admin/users/index.tsx';
+import CreateReport from './routes/reports/createReport.tsx';
 
 // Wrappers
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
@@ -39,6 +40,17 @@ const App = () => {
             <ProtectedRoute>
               <MainLayout>
                 <Dashboard />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path='/reports/create'
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <CreateReport />
               </MainLayout>
             </ProtectedRoute>
           }

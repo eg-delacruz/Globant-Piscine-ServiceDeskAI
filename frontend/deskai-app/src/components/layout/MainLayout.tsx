@@ -68,6 +68,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                   Dashboard
                 </Link>
 
+                <Link
+                  to='/reports/create'
+                  className='text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm'
+                >
+                  Create Report
+                </Link>
+
                 {/* Admin Dropdown for super_user */}
                 {user.role === 'super_user' && (
                   <div className='relative' ref={dropdownRef}>
