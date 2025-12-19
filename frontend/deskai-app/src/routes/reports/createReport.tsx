@@ -11,6 +11,7 @@ import {
 } from '@/state/office/officeSlice';
 import {
   createReport,
+  getAllReports,
   selectCreateReportStatus,
   selectReportError,
   clearReportError,
@@ -127,7 +128,7 @@ const CreateReport = () => {
 
     await dispatch(createReport(form));
 
-    // TODO: refetch reports list here
+    await dispatch(getAllReports());
 
     // Optionally, reset form after submission
     setFormData({

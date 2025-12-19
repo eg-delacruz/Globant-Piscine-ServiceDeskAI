@@ -5,6 +5,14 @@ import { Report } from '@modules/report/report.model';
 
 import { successResponse, errorResponse } from '@utils/response';
 
+//Utils
+import { getBaseUrl } from '@utils/url';
+
+import { logger } from '@config/logger';
+
+import fs from 'fs';
+import path from 'path';
+
 export const createReport = async (
   req: AuthRequest,
   res: Response,
@@ -58,11 +66,20 @@ export const getAllReports = async (
   next: NextFunction
 ) => {
   try {
-    // TODO: check if this is the proper way to use populate
+    const baseUrl = getBaseUrl(req);
+
     // Fetch all reports with user details and office info
     const reports = await Report.find()
       .populate('createdBy', 'email')
       .populate('office', 'name location');
+
+    //Loop through reports to prepend baseUrl to attachment paths
+    reports.forEach((report) => {
+      report.attachments = report.attachments.map(
+        (attachment) => `${baseUrl}${attachment}`
+      );
+    });
+
     return successResponse(res, reports, 'Reports fetched successfully', 200);
   } catch (error) {
     next(error);
@@ -104,7 +121,7 @@ export const deleteReportById = async (
   try {
     const reportId = req.params.id;
 
-    const report = await Report.findByIdAndDelete(reportId);
+    const report = await Report.findById(reportId);
 
     if (!report) {
       return errorResponse(
@@ -115,13 +132,41 @@ export const deleteReportById = async (
       );
     }
 
-    return successResponse(res, null, 'Report deleted successfully', 200);
+    // 🔥 Delete attachments from filesystem
+    if (report.attachments && report.attachments.length > 0) {
+      report.attachments.forEach((attachmentPath) => {
+        /**
+         * attachmentPath example:
+         * /uploads/reports/1766142917297-595954635.jpeg
+         */
+
+        const fullPath = path.join(process.cwd(), attachmentPath);
+
+        // Safety check: ensure we only delete inside uploads
+        if (fullPath.includes(path.join(process.cwd(), 'uploads'))) {
+          fs.unlink(fullPath, (err) => {
+            if (err && err.code !== 'ENOENT') {
+              logger.error(`Failed to delete file ${fullPath}:` + err);
+            }
+          });
+        }
+      });
+    }
+
+    // 🗑️ Delete report from DB
+    const deletedReport = await report.deleteOne();
+
+    return successResponse(
+      res,
+      deletedReport,
+      'Report deleted successfully',
+      200
+    );
   } catch (error) {
     next(error);
   }
 };
 
-// TODO: if report is closed, do not allow status updates
 export const updateReportStatus = async (
   req: AuthRequest,
   res: Response,

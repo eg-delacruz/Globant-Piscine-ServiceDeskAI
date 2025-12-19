@@ -14,7 +14,12 @@ const router = Router();
 router.post('/create', authMiddleware, requireRole('super_user'), createOffice);
 
 // Get all offices
-router.get('/', authMiddleware, requireRole('super_user'), getAllOffices);
+router.get(
+  '/',
+  authMiddleware,
+  requireRole('super_user', 'service_desk_user', 'standard_user'),
+  getAllOffices
+);
 
 // Delete office by ID
 router.delete(

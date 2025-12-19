@@ -80,6 +80,58 @@ export const createReport = createAsyncThunk<
   }
 });
 
+export const getAllReports = createAsyncThunk<
+  Report[], // Return type
+  void, // Argument type
+  { rejectValue: string } // Rejection value type
+>('report/getAll', async (_, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${API_URL}/reports/all`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'x-client-key': CLIENT_KEY,
+      },
+    });
+
+    const data: ApiResponse<Report[]> = await response.json();
+
+    if (!response.ok || data.error) {
+      return rejectWithValue(data.error || 'Failed to fetch reports');
+    }
+
+    return data.body;
+  } catch (error) {
+    return rejectWithValue('Network error: Unable to fetch reports.');
+  }
+});
+
+export const deleteReport = createAsyncThunk<
+  string, // Return type
+  string, // Argument type (report ID)
+  { rejectValue: string } // Rejection value type
+>('report/delete', async (reportId, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${API_URL}/reports/delete/${reportId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'x-client-key': CLIENT_KEY,
+      },
+    });
+
+    const data: ApiResponse<null> = await response.json();
+
+    if (!response.ok || data.error) {
+      return rejectWithValue(data.error || 'Failed to delete report');
+    }
+
+    return reportId;
+  } catch (error) {
+    return rejectWithValue('Network error: Unable to delete report.');
+  }
+});
+
 // Create slice
 const reportSlice = createSlice({
   name: 'report',
@@ -109,6 +161,40 @@ const reportSlice = createSlice({
       .addCase(createReport.rejected, (state, action) => {
         state.createReportStatus = 'failed';
         state.error = action.payload || 'Failed to create report';
+      })
+      // Get All Reports
+      .addCase(getAllReports.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(
+        getAllReports.fulfilled,
+        (state, action: PayloadAction<Report[]>) => {
+          state.status = 'succeeded';
+          state.reports = action.payload;
+        }
+      )
+      .addCase(getAllReports.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to fetch reports';
+      })
+      // Delete Report
+      .addCase(deleteReport.pending, (state) => {
+        state.deleteReportStatus = 'loading';
+        state.error = null;
+      })
+      .addCase(
+        deleteReport.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.deleteReportStatus = 'succeeded';
+          state.reports = state.reports.filter(
+            (report) => report._id !== action.payload
+          );
+        }
+      )
+      .addCase(deleteReport.rejected, (state, action) => {
+        state.deleteReportStatus = 'failed';
+        state.error = action.payload || 'Failed to delete report';
       });
   },
 });

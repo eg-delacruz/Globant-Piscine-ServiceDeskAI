@@ -17,8 +17,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
+// If behind a proxy (e.g., when deployed on Heroku), trust the proxy
+app.set('trust proxy', true); // trust first proxy
+
 // Static files (for serving uploaded files)
-// TODO: test this from frontend
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // CORS

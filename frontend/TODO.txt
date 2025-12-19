@@ -3,3 +3,4 @@ watch: {
   ignored: ['**/node_modules/**', '**/.pnpm-store/**', '**/dist/**']
 }
 
+2. // Paste images to a folder outside the frontend container to be used as images for seeding db info (reports, offices, users, etc.)
