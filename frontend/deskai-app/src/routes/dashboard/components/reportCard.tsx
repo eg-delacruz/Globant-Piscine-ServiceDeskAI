@@ -7,6 +7,8 @@ import { useAppDispatch, useAppSelector } from '@/state/store';
 import { deleteReport } from '@/state/report/reportSlice';
 import { selectUser } from '@/state/user/userSlice';
 
+import { Link } from 'react-router';
+
 type ReportCardProps = {
   report: Report;
 };
@@ -45,11 +47,6 @@ const ReportCard = ({ report }: ReportCardProps) => {
     if (window.confirm('Are you sure you want to delete this report?')) {
       dispatch(deleteReport(id));
     }
-  };
-
-  const handleEdit = (id: string) => {
-    console.log('Edit report:', id);
-    // Navigate to edit page
   };
 
   return (
@@ -145,15 +142,15 @@ const ReportCard = ({ report }: ReportCardProps) => {
           {/* Buttons */}
           <div className='flex items-center gap-2'>
             {currentUser && currentUser.role !== 'standard_user' && (
-              <button
-                onClick={() => handleEdit(report._id)}
+              <Link
+                to={`/reports/${report._id}`}
                 className='p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors'
                 title='Edit Report'
               >
                 <span className='material-symbols-outlined text-slate-600 dark:text-gray-300'>
                   edit_square
                 </span>
-              </button>
+              </Link>
             )}
 
             {currentUser && currentUser.role === 'super_user' && (

@@ -9,7 +9,8 @@ import Unauthorized from './routes/unauthorized/Unauthorized.tsx';
 import AdminPage from './routes/admin/index.tsx';
 import OfficeList from './routes/admin/offices/index.tsx';
 import UserList from './routes/admin/users/index.tsx';
-import CreateReport from './routes/reports/createReport.tsx';
+import CreateReport from './routes/reports/create/index.tsx';
+import EditReport from './routes/reports/edit/index.tsx';
 
 // Wrappers
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
@@ -51,6 +52,18 @@ const App = () => {
             <ProtectedRoute>
               <MainLayout>
                 <CreateReport />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Service desk and super user protected routes */}
+        <Route
+          path='/reports/:reportId'
+          element={
+            <ProtectedRoute allowedRoles={['service_desk_user', 'super_user']}>
+              <MainLayout>
+                <EditReport />
               </MainLayout>
             </ProtectedRoute>
           }

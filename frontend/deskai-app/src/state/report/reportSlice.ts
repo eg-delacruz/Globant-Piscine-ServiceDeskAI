@@ -132,6 +132,37 @@ export const deleteReport = createAsyncThunk<
   }
 });
 
+export const modifyReport = createAsyncThunk<
+  Report, // Return type
+  { reportId: string; status: ReportStatus; resolution: string }, // Argument type
+  { rejectValue: string } // Rejection value type
+>(
+  'report/modify',
+  async ({ reportId, status, resolution }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_URL}/reports/modify/${reportId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-client-key': CLIENT_KEY,
+        },
+        body: JSON.stringify({ status, resolution }),
+      });
+
+      const data: ApiResponse<Report> = await response.json();
+
+      if (!response.ok || data.error) {
+        return rejectWithValue(data.error || 'Failed to modify report');
+      }
+
+      return data.body;
+    } catch (error) {
+      return rejectWithValue('Network error: Unable to modify report.');
+    }
+  }
+);
+
 // Create slice
 const reportSlice = createSlice({
   name: 'report',
@@ -195,6 +226,28 @@ const reportSlice = createSlice({
       .addCase(deleteReport.rejected, (state, action) => {
         state.deleteReportStatus = 'failed';
         state.error = action.payload || 'Failed to delete report';
+      })
+      // Modify Report
+      .addCase(modifyReport.pending, (state) => {
+        state.modifyReportStatus = 'loading';
+        state.error = null;
+      })
+      .addCase(
+        modifyReport.fulfilled,
+        (state, action: PayloadAction<Report>) => {
+          state.modifyReportStatus = 'succeeded';
+          // Update the modified report in the reports array
+          const index = state.reports.findIndex(
+            (report) => report._id === action.payload._id
+          );
+          if (index !== -1) {
+            state.reports[index] = action.payload;
+          }
+        }
+      )
+      .addCase(modifyReport.rejected, (state, action) => {
+        state.modifyReportStatus = 'failed';
+        state.error = action.payload || 'Failed to modify report';
       });
   },
 });
@@ -213,7 +266,9 @@ export const selectAllReportsStatus = (state: { report: ReportState }) =>
 export const selectReportById = (
   state: { report: ReportState },
   reportId: string
-) => state.report.reports.find((report) => report._id === reportId);
+) => {
+  return state.report.reports.find((report) => report._id === reportId);
+};
 export const selectCreateReportStatus = (state: { report: ReportState }) =>
   state.report.createReportStatus;
 export const selectReportError = (state: { report: ReportState }) =>
