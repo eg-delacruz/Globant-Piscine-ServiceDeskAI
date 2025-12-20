@@ -4,3 +4,5 @@ export interface ApiResponse<T = any> {
   body: T;
   message: string;
 }
+
+export type fetchStatus = 'idle' | 'loading' | 'succeeded' | 'failed';

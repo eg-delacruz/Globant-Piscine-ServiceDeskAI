@@ -10,7 +10,7 @@ import { selectUser } from '@/state/user/userSlice';
 import { Link } from 'react-router';
 
 type ReportCardProps = {
-  report: Report;
+  report?: Report;
 };
 
 const ReportCard = ({ report }: ReportCardProps) => {
@@ -48,6 +48,15 @@ const ReportCard = ({ report }: ReportCardProps) => {
       dispatch(deleteReport(id));
     }
   };
+
+  if (!report) {
+    return (
+      <div className='animate-pulse bg-gray-100 rounded-lg p-4'>
+        <div className='h-4 bg-gray-200 rounded w-3/4 mb-2'></div>
+        <div className='h-4 bg-gray-200 rounded w-1/2'></div>
+      </div>
+    );
+  }
 
   return (
     <div className='group relative bg-white rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col overflow-hidden'>

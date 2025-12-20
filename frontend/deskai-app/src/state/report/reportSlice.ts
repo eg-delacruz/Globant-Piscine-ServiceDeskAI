@@ -7,6 +7,7 @@ import {
 // imported types
 import type { Office } from '../office/officeSlice';
 import type { User } from '../user/userSlice';
+import type { fetchStatus } from '@/types/generic_types';
 
 // Types
 import type { ApiResponse } from '@/types/generic_types';
@@ -14,7 +15,6 @@ import type { ApiResponse } from '@/types/generic_types';
 import { API_URL, CLIENT_KEY } from '@/config/env';
 
 // Types
-
 export type ReportStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 
 export interface Report {
@@ -35,11 +35,12 @@ export interface Report {
 
 interface ReportState {
   reports: Report[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: fetchStatus;
   error: string | null;
-  createReportStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
-  modifyReportStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
-  deleteReportStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  createReportStatus: fetchStatus;
+  modifyReportStatus: fetchStatus;
+  deleteReportStatus: fetchStatus;
+  getReportByIdStatus: fetchStatus;
 }
 
 // Initial state
@@ -50,6 +51,7 @@ const initialState: ReportState = {
   createReportStatus: 'idle',
   modifyReportStatus: 'idle',
   deleteReportStatus: 'idle',
+  getReportByIdStatus: 'idle',
 };
 
 // Async thunks
@@ -140,15 +142,18 @@ export const modifyReport = createAsyncThunk<
   'report/modify',
   async ({ reportId, status, resolution }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_URL}/reports/modify/${reportId}`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-client-key': CLIENT_KEY,
-        },
-        body: JSON.stringify({ status, resolution }),
-      });
+      const response = await fetch(
+        `${API_URL}/reports/update-status/${reportId}`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-client-key': CLIENT_KEY,
+          },
+          body: JSON.stringify({ status, resolution }),
+        }
+      );
 
       const data: ApiResponse<Report> = await response.json();
 
@@ -163,6 +168,29 @@ export const modifyReport = createAsyncThunk<
   }
 );
 
+export const getReportById = createAsyncThunk<
+  Report, // Return type
+  string, // Argument type (report ID)
+  { rejectValue: string } // Rejection value type
+>('report/getById', async (reportId, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${API_URL}/reports/${reportId}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'x-client-key': CLIENT_KEY,
+      },
+    });
+    const data: ApiResponse<Report> = await response.json();
+    if (!response.ok || data.error) {
+      return rejectWithValue(data.error || 'Failed to fetch report');
+    }
+    return data.body;
+  } catch (error) {
+    return rejectWithValue('Network error: Unable to fetch report.');
+  }
+});
+
 // Create slice
 const reportSlice = createSlice({
   name: 'report',
@@ -173,6 +201,15 @@ const reportSlice = createSlice({
     },
     resetCreateReportStatus: (state) => {
       state.createReportStatus = 'idle';
+    },
+    resetModifyReportStatus: (state) => {
+      state.modifyReportStatus = 'idle';
+    },
+    resetDeleteReportStatus: (state) => {
+      state.deleteReportStatus = 'idle';
+    },
+    resetGetReportByIdStatus: (state) => {
+      state.getReportByIdStatus = 'idle';
     },
   },
   extraReducers: (builder) => {
@@ -248,13 +285,42 @@ const reportSlice = createSlice({
       .addCase(modifyReport.rejected, (state, action) => {
         state.modifyReportStatus = 'failed';
         state.error = action.payload || 'Failed to modify report';
+      })
+      // Get Report By ID
+      .addCase(getReportById.pending, (state) => {
+        state.getReportByIdStatus = 'loading';
+        state.error = null;
+      })
+      .addCase(
+        getReportById.fulfilled,
+        (state, action: PayloadAction<Report>) => {
+          state.getReportByIdStatus = 'succeeded';
+          // Update or add the fetched report in the reports array
+          const index = state.reports.findIndex(
+            (report) => report._id === action.payload._id
+          );
+          if (index !== -1) {
+            state.reports[index] = action.payload;
+          } else {
+            state.reports.push(action.payload);
+          }
+        }
+      )
+      .addCase(getReportById.rejected, (state, action) => {
+        state.getReportByIdStatus = 'failed';
+        state.error = action.payload || 'Failed to fetch report';
       });
   },
 });
 
 // Export actions and reducer
-export const { clearReportError, resetCreateReportStatus } =
-  reportSlice.actions;
+export const {
+  clearReportError,
+  resetCreateReportStatus,
+  resetModifyReportStatus,
+  resetDeleteReportStatus,
+  resetGetReportByIdStatus,
+} = reportSlice.actions;
 
 export default reportSlice.reducer;
 
@@ -277,3 +343,5 @@ export const selectModifyReportStatus = (state: { report: ReportState }) =>
   state.report.modifyReportStatus;
 export const selectDeleteReportStatus = (state: { report: ReportState }) =>
   state.report.deleteReportStatus;
+export const selectGetReportByIdStatus = (state: { report: ReportState }) =>
+  state.report.getReportByIdStatus;

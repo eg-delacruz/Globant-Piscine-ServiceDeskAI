@@ -59,7 +59,7 @@ const App = () => {
 
         {/* Service desk and super user protected routes */}
         <Route
-          path='/reports/:reportId'
+          path='/reports/:id'
           element={
             <ProtectedRoute allowedRoles={['service_desk_user', 'super_user']}>
               <MainLayout>

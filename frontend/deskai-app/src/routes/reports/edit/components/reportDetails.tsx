@@ -2,7 +2,7 @@
 import type { Report } from '@/state/report/reportSlice';
 
 type ReportDetailsProps = {
-  report: Report;
+  report: Report | undefined;
 };
 const ReportDetails = ({ report }: ReportDetailsProps) => {
   const formatDate = (dateString: string) => {
@@ -23,7 +23,7 @@ const ReportDetails = ({ report }: ReportDetailsProps) => {
       {/* Main Detail Card */}
       <div className='bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden'>
         {/* Image Banner */}
-        {report.attachments && report.attachments.length > 0 && (
+        {report?.attachments && report.attachments.length > 0 && (
           <div className='h-64 w-full bg-slate-100 relative group'>
             <img
               src={report.attachments[0]}
@@ -63,7 +63,7 @@ const ReportDetails = ({ report }: ReportDetailsProps) => {
                 />
               </svg>
               <span className='font-medium text-slate-700'>
-                {report.office.name}
+                {report?.office.name}
               </span>
             </div>
             <div className='hidden sm:block w-px h-4 bg-slate-300'></div>
@@ -81,7 +81,7 @@ const ReportDetails = ({ report }: ReportDetailsProps) => {
                   d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
                 />
               </svg>
-              <span>{formatDate(report.createdAt)}</span>
+              <span>{formatDate(report?.createdAt ?? '')}</span>
             </div>
             <div className='hidden sm:block w-px h-4 bg-slate-300'></div>
             <div className='flex items-center gap-2'>
@@ -98,17 +98,17 @@ const ReportDetails = ({ report }: ReportDetailsProps) => {
                   d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
                 />
               </svg>
-              <span>{report.createdBy.email}</span>
+              <span>{report?.createdBy.email}</span>
             </div>
           </div>
 
           {/* Title & Description */}
           <h2 className='text-2xl font-bold text-slate-800 mb-4'>
-            {report.title}
+            {report?.title}
           </h2>
           <div className='prose prose-slate max-w-none text-slate-600 bg-slate-50 p-6 rounded-xl border border-slate-100'>
             <p className='whitespace-pre-wrap leading-relaxed'>
-              {report.description}
+              {report?.description}
             </p>
           </div>
         </div>

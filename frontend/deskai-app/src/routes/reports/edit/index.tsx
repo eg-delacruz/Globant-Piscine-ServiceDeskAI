@@ -4,71 +4,50 @@ import { useParams, useNavigate } from 'react-router-dom'; // Assuming react-rou
 // Components
 import ReportDetails from './components/reportDetails';
 import UpdateStatus from './components/updateStatus';
+import Loader from '@/components/Loader';
 
 //Redux
-import { useAppDispatch, useAppSelector } from '@/state/store';
-import { selectReportById, modifyReport } from '@/state/report/reportSlice';
+import { useAppSelector, useAppDispatch } from '@/state/store';
+import {
+  selectModifyReportStatus,
+  resetModifyReportStatus,
+  modifyReport,
+} from '@/state/report/reportSlice';
 
-import type { Report } from '@/state/report/reportSlice';
+// Hooks
+import { useReportForm } from '@/hooks/useGetReportById';
+
+import type { ReportStatus } from '@/state/report/reportSlice';
 
 const EditReport = () => {
   const { id } = useParams(); // Get report ID from URL
   const navigate = useNavigate();
-
-  // Mock Data - In reality, fetch this using the 'id'
-  const [report, setReport] = useState<Report>({
-    _id: '101',
-    title: 'Leaking Pipe in Kitchen',
-    description:
-      'There is a steady drip coming from the sink pipe. It has created a small puddle on the floor. Urgent because of slip hazard.',
-    status: 'open',
-    modifiedBy: {
-      _id: '102',
-      role: 'super_user',
-      email: 'jane.smith@company.com',
-    },
-    office: {
-      _id: '1',
-      createdAt: '2023-01-01T00:00:00Z',
-      name: 'Headquarters NYC',
-      location: '123 Innovation Dr',
-      isActive: true,
-      updatedAt: '2023-01-01T00:00:00Z',
-    },
-    createdBy: {
-      _id: '101',
-      role: 'super_user',
-      email: 'john.doe@company.com',
-    },
-    attachments: [
-      'https://plus.unsplash.com/premium_photo-1681236323432-3df82be0c1b0?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    ],
-    createdAt: '2023-10-25T10:30:00Z',
-    resolution: '', // Initial resolution
-    updatedAt: '2023-10-25T10:30:00Z',
-  });
-
-  // Local state for editing
-  const [status, setStatus] = useState(report.status);
-  const [resolution, setResolution] = useState(report.resolution || '');
-
-  // TODO: check why this doesn't fetch the report from store...
-  const reportFromStore = useAppSelector((state) =>
-    selectReportById(state, id || '')
-  );
   const dispatch = useAppDispatch();
 
-  console.log('Report from store:', reportFromStore);
+  const { report, isLoading, isError, shouldShowNotFound } = useReportForm(id);
 
-  // Update local state when report loads
+  // Input values
+  const [status, setStatus] = useState<ReportStatus>('open');
+  const [resolution, setResolution] = useState('');
+  const modifyReportStatus = useAppSelector(selectModifyReportStatus);
+
+  // Reset status on mount
   useEffect(() => {
-    setStatus(report.status);
-    setResolution(report.resolution || '');
+    dispatch(resetModifyReportStatus());
+  }, [dispatch]);
+
+  // Initialize form when report loads
+  useEffect(() => {
+    if (report) {
+      setStatus(report.status);
+      setResolution(report.resolution || '');
+    }
   }, [report]);
 
-  // TODO: only do the request is status or resolution changed
-  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!report) return;
 
     // Validation: Resolution is required if status is CLOSED
     if (status === 'closed' && !resolution.trim()) {
@@ -76,10 +55,64 @@ const EditReport = () => {
       return;
     }
 
-    console.log('Saving changes:', { status, resolution });
-    // Add API call here
-    navigate('/reports'); // Redirect back to list
+    if (report?.status === 'closed') {
+      alert('This report is already closed and cannot be modified.');
+      return;
+    }
+
+    if (report?.status === status || report?.resolution === resolution) {
+      alert('No changes detected to save.');
+      return;
+    }
+
+    try {
+      await dispatch(
+        modifyReport({
+          reportId: report._id,
+          status,
+          resolution: status === 'closed' ? resolution : '',
+        })
+      ).unwrap(); // Wait for the action to complete
+
+      navigate('/reports');
+    } catch (error) {
+      console.error('Error modifying report:', error);
+    }
   };
+
+  if (isLoading) return <Loader />;
+
+  if (isError) {
+    return (
+      <div className='text-center p-8'>
+        <h2 className='text-xl font-bold text-red-600 mb-2'>
+          Error loading report.
+        </h2>
+        <button
+          onClick={() => navigate('/reports')}
+          className='mt-4 px-4 py-2 bg-blue-600 text-white rounded'
+        >
+          Back to Reports
+        </button>
+      </div>
+    );
+  }
+
+  if (shouldShowNotFound) {
+    return (
+      <div className='text-center p-8'>
+        <h2 className='text-xl font-bold text-red-600 mb-2'>
+          Report Not Found
+        </h2>
+        <button
+          onClick={() => navigate('/reports')}
+          className='mt-4 px-4 py-2 bg-blue-600 text-white rounded'
+        >
+          Back to Reports
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className='max-w-4xl mx-auto animate-fade-in-up pb-10'>
@@ -106,7 +139,7 @@ const EditReport = () => {
         </button>
         <h1 className='text-3xl font-extrabold text-slate-800'>
           Edit Report{' '}
-          <span className='text-slate-400 font-normal'>#{report._id}</span>
+          <span className='text-slate-400 font-normal'>#{report?._id}</span>
         </h1>
       </div>
 
@@ -121,6 +154,8 @@ const EditReport = () => {
           resolution={resolution}
           setResolution={setResolution}
           handleSave={handleSave}
+          modifyReportStatus={modifyReportStatus}
+          incommingStatus={report?.status ?? 'open'}
         />
       </div>
     </div>

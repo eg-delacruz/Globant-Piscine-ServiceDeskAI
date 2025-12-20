@@ -92,6 +92,8 @@ export const getReportById = async (
   next: NextFunction
 ) => {
   try {
+    const baseUrl = getBaseUrl(req);
+
     const reportId = req.params.id;
 
     const report = await Report.findById(reportId)
@@ -106,6 +108,11 @@ export const getReportById = async (
         `No report with ID ${reportId}`
       );
     }
+
+    // Prepend baseUrl to attachment paths
+    report.attachments = report.attachments.map(
+      (attachment) => `${baseUrl}${attachment}`
+    );
 
     return successResponse(res, report, 'Report fetched successfully', 200);
   } catch (error) {
@@ -173,6 +180,7 @@ export const updateReportStatus = async (
   next: NextFunction
 ) => {
   try {
+    const baseUrl = getBaseUrl(req);
     const reportId = req.params.id;
     const { status, resolution } = req.body;
     const updateData: any = { status };
@@ -191,7 +199,9 @@ export const updateReportStatus = async (
 
     const report = await Report.findByIdAndUpdate(reportId, updateData, {
       new: true, // This option returns the modified document. If not set, it returns the original.
-    });
+    })
+      .populate('createdBy', 'email')
+      .populate('office', 'name location');
 
     if (!report) {
       return errorResponse(
@@ -201,6 +211,11 @@ export const updateReportStatus = async (
         `No report with ID ${reportId}`
       );
     }
+
+    // Prepend baseUrl to attachment paths
+    report.attachments = report.attachments.map(
+      (attachment) => `${baseUrl}${attachment}`
+    );
 
     return successResponse(
       res,

@@ -4,7 +4,7 @@ import {
   type PayloadAction,
 } from '@reduxjs/toolkit';
 
-import type { ApiResponse } from '@/types/generic_types';
+import type { ApiResponse, fetchStatus } from '@/types/generic_types';
 
 import { API_URL, CLIENT_KEY } from '@/config/env';
 
@@ -22,21 +22,21 @@ export interface AuthResponse {
 export interface UserState {
   // Logged in user info
   user: User | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: fetchStatus;
   logout_loading: boolean;
   error: string | null;
 
   // Create new user state
-  create_new_user_status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  create_new_user_status: fetchStatus;
   create_new_user_error: string | null;
 
   // Fetch all users state
   users: User[];
-  fetch_all_users_status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  fetch_all_users_status: fetchStatus;
   fetch_all_users_error: string | null;
 
   // Delete user state
-  delete_user_status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  delete_user_status: fetchStatus;
 }
 
 // Initial state
