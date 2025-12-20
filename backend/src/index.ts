@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { connectDB } from '@config/db';
-import { ensureSuperUser } from '@seed/ensureSuperUser';
 
 import app from '@/app.ts';
 
@@ -16,9 +15,6 @@ import { logger } from '@config/logger';
 async function startServer() {
   // Connect to MongoDB
   await connectDB();
-
-  // Ensure super user exists
-  await ensureSuperUser();
 
   // Start Express server
   app.listen(env.PORT, () => {

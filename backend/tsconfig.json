@@ -17,8 +17,8 @@
       "@utils/*": ["utils/*"],
       "@middlewares/*": ["middlewares/*"],
       "@routes/*": ["routes/*"],
-      "@seed/*": ["seed/*"],
       "@interfaces/*": ["types/*"],
+      "@scripts/*": ["scripts/*"],
       "@/*": ["*"]
     }
   }
