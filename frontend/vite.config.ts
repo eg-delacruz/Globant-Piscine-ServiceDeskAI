@@ -27,6 +27,7 @@ export default defineConfig({
       usePolling: true,
       // Optional: Increase the polling interval if needed, though 100ms is usually fine
       interval: 100,
+      ignored: ['**/node_modules/**', '**/.pnpm-store/**', '**/dist/**'],
     },
   },
 });
