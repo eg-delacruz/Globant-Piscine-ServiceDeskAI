@@ -76,7 +76,7 @@ Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/Globant-Piscine-ServiceDeskAI.git](https://github.com/your-username/Globant-Piscine-ServiceDeskAI.git)
+    git clone [https://github.com/eg-delacruz/Globant-Piscine-ServiceDeskAI](https://github.com/eg-delacruz/Globant-Piscine-ServiceDeskAI)
     cd Globant-Piscine-ServiceDeskAI
     ```
 2.  **Configure Environment:**
