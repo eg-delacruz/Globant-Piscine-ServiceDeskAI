@@ -102,10 +102,10 @@ Once the database is seeded, you can use the following accounts to test the diff
 
 ## 📂 Repository Structure
 
-```bash
-.
+```text
 ├── backend/           # Express API, JWT Middleware, Mongoose Models
 ├── frontend/          # React + Redux source code (Vite)
 ├── uploads/           # Storage for user-uploaded images
 ├── seed_images/       # Assets for initial database seeding
 └── docker-compose.yml # Container orchestration
+```
