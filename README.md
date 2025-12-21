@@ -75,13 +75,16 @@ Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/
 ### **First Time Setup**
 
 1.  **Clone the repository:**
-
-    git clone [https://github.com/eg-delacruz/Globant-Piscine-ServiceDeskAI](https://github.com/eg-delacruz/Globant-Piscine-ServiceDeskAI)
+    ```bash
+    git clone [https://github.com/your-username/Globant-Piscine-ServiceDeskAI.git](https://github.com/your-username/Globant-Piscine-ServiceDeskAI.git)
     cd Globant-Piscine-ServiceDeskAI
+    ```
 2.  **Configure Environment:**
     Create a `.env` file in the root directory and copy the content from `.env.example`.
 3.  **Launch with Docker:**
+    ```bash
     docker-compose up --build -d
+    ```
 4.  **Access the App:**
     The database will automatically seed. Open your browser at:
     👉 **`http://localhost:5173`**
