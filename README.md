@@ -9,13 +9,27 @@
 
 ---
 
-## 📱 User Interface
-Below are previews of the Service DeskAI mobile-first experience:
+## 📱 User Interface Walkthrough
 
-| **Login & Auth** | **User Dashboard** | **Admin Controls** |
-| :---: | :---: | :---: |
-| ![Login Screen](https://i.imgur.com/BaLUqMS.png) | ![Ticket List](https://i.imgur.com/L52XMFY.png) | ![Admin Panel](https://i.imgur.com/mF149Xt.png) |
-| *Secure JWT Login* | *Ticket Tracking* | *System Overview* |
+Service DeskAI is designed with a mobile-first approach, ensuring a smooth experience for field staff and office managers alike.
+
+### 1. Secure Access
+Users start with a secure, JWT-authenticated login screen, responsive to any device size.
+
+![Login Screen - Secure JWT Authentication](https://i.imgur.com/BaLUqMS.png)
+<br>
+
+### 2. The Dashboard (Standard & Service Desk View)
+Once logged in, users see a clear overview of tickets relevant to their role, allowing for quick tracking and status updates.
+
+![User Dashboard - Ticket Tracking](https://i.imgur.com/L52XMFY.png)
+<br>
+
+### 3. Admin Controls
+Administrators have access to a dedicated panel for managing offices, users, and viewing system-wide data.
+
+![Admin Panel - System Overview](https://i.imgur.com/mF149Xt.png)
+<br>
 
 ---
 
@@ -88,6 +102,8 @@ Once the database is seeded, you can use the following accounts to test the diff
 
 ## 📂 Repository Structure
 
+```bash
+.
 ├── backend/           # Express API, JWT Middleware, Mongoose Models
 ├── frontend/          # React + Redux source code (Vite)
 ├── uploads/           # Storage for user-uploaded images
