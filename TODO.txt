@@ -1,1 +1,0 @@
-3. When uploading, create a .env.example file in the frontend folder with the following content:
