@@ -10,7 +10,8 @@ services:
       - frontend_node_modules:/app/node_modules
       - frontend_pnpm_store:/root/.local/share/pnpm/store
     container_name: vite-frontend
-    command: sh -c "pnpm install && pnpm run dev"
+    init: true
+    command: sh -c "pnpm install && exec pnpm run dev"
     stdin_open: true
     tty: true
     env_file:
@@ -56,10 +57,11 @@ services:
       - backend_pnpm_store:/root/.local/share/pnpm/store # Host's pnpm store changes won't affect container
       - ./seed_images:/app/seed_images # Folder with images for seeding -> give the container access to the images
     container_name: db-seeder
+    init: true
     depends_on:
       mongo:
         condition: service_healthy
-    command: sh -c "pnpm install && pnpm run seed"
+    command: sh -c "pnpm install && exec pnpm run seed"
     env_file:
       - .env
     environment:
@@ -82,7 +84,8 @@ services:
       - backend_node_modules:/app/node_modules # Host's node_modules changes won't affect container
       - backend_pnpm_store:/root/.local/share/pnpm/store # Host's pnpm store changes won't affect container
     container_name: express-backend
-    command: sh -c "pnpm install && pnpm run dev"
+    init: true
+    command: sh -c "pnpm install && exec pnpm run dev"
     stdin_open: true
     tty: true
     env_file:
